@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Temmink Bouwprojekten – Maakt de Ruimte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        amber:    '#F9B002',
+        'amber-dk': '#C78900',
+        'amber-lt': '#FEF6E0',
+        dark:     '#1A1A12',
+        dark2:    '#2C2C1A',
+      },
+      fontFamily: {
+        poppins:  ['Poppins','sans-serif'],
+        playfair: ['Playfair Display','serif'],
+        bebas:    ['Bebas Neue','cursive'],
+      }
+    }
+  }
+}
+</script>
+<style>
+:root{
+  --amber:#F9B002;
+  --amber-dk:#C78900;
+  --amber-lt:#FEF6E0;
+  --dark:#1A1A12;
+  --dark2:#2C2C1A;
+  --white:#FFFFFF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Poppins',sans-serif;background:#fff;color:var(--dark);overflow-x:hidden;}
+
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;background:var(--amber);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s ease;}
+#loader.hidden{opacity:0;pointer-events:none;}
+.ld-logo{width:110px;margin-bottom:28px;}
+.ld-bar-wrap{width:200px;height:3px;background:rgba(0,0,0,.2);border-radius:2px;overflow:hidden;}
+.ld-bar{height:100%;background:#fff;border-radius:2px;animation:ldFill 1.6s ease forwards;}
+@keyframes ldFill{from{width:0}to{width:100%}}
+.ld-text{margin-top:14px;font-size:.75rem;letter-spacing:.15em;color:#fff;font-family:'Poppins',sans-serif;font-weight:500;text-transform:uppercase;}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.in{opacity:1;transform:none;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--amber);transition:background .3s,box-shadow .3s;}
+nav.scrolled{background:var(--amber);box-shadow:0 2px 16px rgba(0,0,0,.15);}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:70px;}
+.nav-brand img{height:42px;width:auto;display:block;}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-links a{font-size:.875rem;font-weight:500;color:#fff;text-decoration:none;letter-spacing:.03em;position:relative;padding-bottom:3px;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:#fff;transition:width .3s;}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{background:#fff!important;color:var(--amber-dk)!important;padding:10px 22px!important;border-radius:4px!important;font-weight:600!important;transition:background .2s,color .2s!important;}
+.nav-cta::after{display:none!important;}
+.nav-cta:hover{background:rgba(255,255,255,.85)!important;}
+.nav-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.nav-toggle span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:.3s;}
+.mobile-menu{display:none;position:fixed;top:70px;left:0;right:0;background:var(--amber);z-index:99;padding:16px 24px 24px;flex-direction:column;gap:16px;box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:1rem;font-weight:500;color:#fff;text-decoration:none;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.2);}
+.mobile-menu a:last-child{border-bottom:none;}
+@media(max-width:768px){
+  .nav-links{display:none;}
+  .nav-toggle{display:flex;}
+}
+
+/* ── HERO ── */
+#hero{position:relative;height:100svh;min-height:560px;overflow:hidden;display:flex;align-items:flex-end;}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(.55);}
+.hero-content{position:relative;z-index:2;padding:0 24px 80px;max-width:1200px;margin:0 auto;width:100%;}
+.hero-content h1{font-family:'Bebas Neue',cursive;font-size:clamp(4rem,10vw,9rem);line-height:.95;color:#fff;letter-spacing:.02em;}
+.hero-content h1 span{display:block;}
+.hero-content h1 em{font-style:normal;color:var(--amber);}
+.hero-sub{font-size:clamp(1rem,2vw,1.25rem);color:rgba(255,255,255,.85);margin-top:16px;font-weight:300;letter-spacing:.04em;max-width:520px;}
+.hero-strip{display:flex;gap:40px;margin-top:36px;flex-wrap:wrap;}
+.h-st{text-align:left;}
+.h-st-n{font-family:'Bebas Neue',cursive;font-size:2.6rem;line-height:1;color:var(--amber);}
+.h-st-n span{color:#fff;}
+.h-st-l{font-size:.75rem;color:rgba(255,255,255,.7);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+.hero-btn{display:inline-block;margin-top:32px;background:var(--amber);color:var(--dark);padding:14px 32px;border-radius:4px;font-weight:600;font-size:.95rem;text-decoration:none;letter-spacing:.03em;transition:background .2s,transform .2s;}
+.hero-btn:hover{background:var(--amber-dk);transform:translateY(-2px);}
+@media(max-width:640px){
+  .hero-content{padding:0 20px 60px;}
+  .hero-strip{gap:28px;}
+}
+
+/* ── SECTION COMMON ── */
+section{padding:100px 24px;}
+.section-inner{max-width:1200px;margin:0 auto;}
+.section-label{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:12px;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);color:var(--dark);line-height:1.15;margin-bottom:20px;}
+.section-body{font-size:1rem;color:#555;line-height:1.8;max-width:600px;}
+.divider{width:52px;height:3px;background:var(--amber);margin-bottom:20px;}
+
+/* ── ABOUT ── */
+#about{background:#fff;}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.about-img-wrap{position:relative;}
+.about-img-wrap img{width:100%;height:480px;object-fit:cover;border-radius:6px;display:block;}
+.about-accent{position:absolute;bottom:-20px;right:-20px;width:120px;height:120px;background:var(--amber);border-radius:4px;z-index:-1;}
+.about-badges{display:flex;gap:32px;margin-top:36px;flex-wrap:wrap;}
+.ab-badge{text-align:center;}
+.ab-num{font-family:'Bebas Neue',cursive;font-size:2.8rem;color:var(--amber);line-height:1;}
+.ab-lbl{font-size:.78rem;color:#888;letter-spacing:.08em;text-transform:uppercase;}
+.about-text p+p{margin-top:14px;}
+@media(max-width:900px){
+  .about-grid{grid-template-columns:1fr;gap:40px;}
+  .about-img-wrap img{height:320px;}
+  .about-accent{display:none;}
+}
+
+/* ── SERVICES ── */
+#diensten{background:var(--dark);}
+#diensten .section-title{color:#fff;}
+#diensten .section-body{color:rgba(255,255,255,.65);}
+.srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px;}
+.srv-card{border-radius:6px;overflow:hidden;background:var(--dark2);position:relative;}
+.srv-card img{width:100%;height:200px;object-fit:cover;display:block;filter:brightness(.8);transition:filter .3s,transform .4s;}
+.srv-card:hover img{filter:brightness(1);transform:scale(1.04);}
+.srv-img-wrap{overflow:hidden;}
+.srv-body{padding:24px 20px 28px;}
+.srv-icon{font-size:1.5rem;margin-bottom:10px;}
+.srv-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:#fff;margin-bottom:8px;}
+.srv-desc{font-size:.875rem;color:rgba(255,255,255,.6);line-height:1.7;}
+@media(max-width:768px){.srv-grid{grid-template-columns:1fr;}}
+
+/* ── PORTFOLIO ── */
+#projecten{background:#fff;}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px;}
+.f-btn{padding:8px 20px;border-radius:4px;border:1.5px solid #ddd;background:#fff;font-size:.875rem;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:500;color:#555;transition:.2s;}
+.f-btn.active,.f-btn:hover{background:var(--amber);border-color:var(--amber);color:var(--dark);}
+.port-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.port-item{position:relative;height:260px;border-radius:6px;overflow:hidden;cursor:pointer;}
+.port-item img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+.port-item:hover img{transform:scale(1.06);}
+.port-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,26,18,.88) 0%,rgba(26,26,18,.2) 60%,transparent 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px;}
+.port-cat{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:4px;}
+.port-name{font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;}
+@media(max-width:768px){.port-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.port-grid{grid-template-columns:1fr;}}
+
+/* ── WERKGEBIED ── */
+#werkgebied{background:var(--amber-lt);}
+.wg-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:40px;}
+.wg-cities{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+.wg-city{background:#fff;border:1.5px solid var(--amber);color:var(--dark);padding:6px 16px;border-radius:4px;font-size:.85rem;font-weight:500;}
+.wg-text{font-size:1rem;color:#555;line-height:1.8;}
+@media(max-width:768px){.wg-grid{grid-template-columns:1fr;gap:32px;}}
+
+/* ── CONTACT ── */
+#contact{background:var(--dark);padding:100px 24px;}
+#contact .section-title{color:#fff;}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:52px;}
+.contact-office{background:var(--dark2);border-radius:8px;padding:36px 32px;}
+.co-label{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:12px;}
+.co-name{font-family:'Playfair Display',serif;font-size:1.35rem;color:#fff;margin-bottom:20px;}
+.co-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.co-icon{color:var(--amber);font-size:1rem;margin-top:2px;flex-shrink:0;}
+.co-val{font-size:.9rem;color:rgba(255,255,255,.75);line-height:1.5;}
+.co-val a{color:rgba(255,255,255,.75);text-decoration:none;}
+.co-val a:hover{color:var(--amber);}
+@media(max-width:768px){.contact-grid{grid-template-columns:1fr;gap:24px;}}
+
+/* ── FOOTER ── */
+footer{background:#111109;padding:36px 24px;text-align:center;}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:16px;}
+.footer-logo img{height:40px;filter:brightness(0) invert(1);}
+.footer-copy{font-size:.8rem;color:rgba(255,255,255,.4);}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <img class="ld-logo" src="imgi_1_01_Temmink-logo_CMYK_zonder-achtergrond.png" alt="Temmink logo"/>
+  <div class="ld-bar-wrap"><div class="ld-bar"></div></div>
+  <p class="ld-text">Temmink Bouwprojekten</p>
+</div>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const {useState,useEffect,useRef} = React;
+
+/* ── helpers ── */
+function useInView(threshold=0.15){
+  const ref=useRef(null);
+  const[vis,setVis]=useState(false);
+  useEffect(()=>{
+    const el=ref.current; if(!el) return;
+    const obs=new IntersectionObserver(([e])=>{if(e.isIntersecting)setVis(true);},{threshold});
+    obs.observe(el);
+    return()=>obs.disconnect();
+  },[]);
+  return[ref,vis];
+}
+
+function BadgeCount({end,suffix=''}){
+  const[val,setVal]=useState(0);
+  const[ref,vis]=useInView(0.3);
+  useEffect(()=>{
+    if(!vis)return;
+    let start=0;const dur=1400;const step=16;
+    const timer=setInterval(()=>{
+      start+=Math.ceil(end/(dur/step));
+      if(start>=end){setVal(end);clearInterval(timer);}else setVal(start);
+    },step);
+    return()=>clearInterval(timer);
+  },[vis,end]);
+  return <span ref={ref}>{val}{suffix}</span>;
+}
+
+/* ── NAV ── */
+function Nav(){
+  const[scrolled,setScrolled]=useState(false);
+  const[open,setOpen]=useState(false);
+  useEffect(()=>{
+    const h=()=>setScrolled(window.scrollY>50);
+    window.addEventListener('scroll',h);
+    return()=>window.removeEventListener('scroll',h);
+  },[]);
+  const links=[['#over','Over ons'],['#diensten','Diensten'],['#projecten','Projecten'],['#werkgebied','Werkgebied'],['#contact','Contact']];
+  return(
+    <>
+    <nav className={scrolled?'scrolled':''}>
+      <div className="nav-inner">
+        <div className="nav-brand"><img src="imgi_1_01_Temmink-logo_CMYK_zonder-achtergrond.png" alt="Temmink"/></div>
+        <div className="nav-links">
+          {links.map(([h,l])=><a key={h} href={h}>{l}</a>)}
+          <a href="#contact" className="nav-cta">Offerte aanvragen</a>
+        </div>
+        <div className="nav-toggle" onClick={()=>setOpen(!open)}>
+          <span/><span/><span/>
+        </div>
+      </div>
+    </nav>
+    <div className={`mobile-menu${open?' open':''}`}>
+      {links.map(([h,l])=><a key={h} href={h} onClick={()=>setOpen(false)}>{l}</a>)}
+      <a href="#contact" onClick={()=>setOpen(false)} style={{color:'var(--amber)',fontWeight:600}}>Offerte aanvragen</a>
+    </div>
+    </>
+  );
+}
+
+/* ── HERO ── */
+function Hero(){
+  return(
+    <section id="hero">
+      <img className="hero-img" src="imgi_5_Grebbelinie-fort-1-1.jpg" alt="Temmink project"/>
+      <div className="hero-content">
+        <h1 className="reveal in">
+          <span>MAAKT DE</span>
+          <span><em>RUIMTE</em></span>
+        </h1>
+        <p className="hero-sub reveal in">Vakkundig bouwen van idee tot oplevering — nieuwbouw, renovatie en transformatie door heel Nederland.</p>
+        <div className="hero-strip">
+          <div className="h-st"><div className="h-st-n"><BadgeCount end={30}/>+</div><div className="h-st-l">Jaar ervaring</div></div>
+          <div className="h-st"><div className="h-st-n"><BadgeCount end={150}/>+</div><div className="h-st-l">Projecten</div></div>
+          <div className="h-st"><div className="h-st-n"><BadgeCount end={2}/></div><div className="h-st-l">Vestigingen</div></div>
+        </div>
+        <a href="#projecten" className="hero-btn reveal in">Bekijk projecten</a>
+      </div>
+    </section>
+  );
+}
+
+/* ── ABOUT ── */
+function About(){
+  const[ref,vis]=useInView();
+  return(
+    <section id="over">
+      <div className="section-inner">
+        <div className={`about-grid reveal${vis?' in':''}`} ref={ref}>
+          <div className="about-img-wrap">
+            <img src="imgi_34_Samenwerken.jpg" alt="Team Temmink"/>
+            <div className="about-accent"/>
+          </div>
+          <div className="about-text">
+            <p className="section-label">Over ons</p>
+            <div className="divider"/>
+            <h2 className="section-title">Bouwprojekten met<br/>vakmanschap & visie</h2>
+            <div className="section-body">
+              <p>Temmink Bouwprojekten is een allround aannemer met vestigingen in Deventer en Den Hoorn. Wij realiseren uiteenlopende bouwprojecten — van nieuwbouwwoningen en utiliteitsbouw tot complexe transformaties en renovaties van monumentale panden.</p>
+              <p style={{marginTop:14}}>Ons team van vakmensen werkt nauw samen met opdrachtgevers, architecten en adviseurs om elk project tot een succes te maken. Kwaliteit, transparantie en een persoonlijke aanpak staan daarbij altijd centraal.</p>
+            </div>
+            <div className="about-badges">
+              <div className="ab-badge"><div className="ab-num"><BadgeCount end={30}/>+</div><div className="ab-lbl">Jaar ervaring</div></div>
+              <div className="ab-badge"><div className="ab-num"><BadgeCount end={2}/></div><div className="ab-lbl">Vestigingen</div></div>
+              <div className="ab-badge"><div className="ab-num"><BadgeCount end={150}/>+</div><div className="ab-lbl">Projecten</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── SERVICES ── */
+function Diensten(){
+  const[ref,vis]=useInView();
+  const items=[
+    {img:'imgi_4_1-klein-1-1.png',   title:'Nieuwbouw',              desc:'Van vrijstaande woningen tot appartementencomplexen. Wij realiseren nieuwbouwprojecten op maat, met oog voor detail en duurzaamheid.'},
+    {img:'imgi_7_Bedrijfspand-Zutphen-01.jpg', title:'Utiliteitsbouw', desc:'Bedrijfspanden, kantoren en publieke gebouwen. Functioneel, toekomstbestendig en gebouwd met de hoogste kwaliteitsstandaarden.'},
+    {img:'imgi_8_Transformatie-Utrecht-WB31-2.jpg', title:'Transformatie & Renovatie', desc:'Bestaande panden een nieuw leven geven. Van monumentale restauraties tot grootschalige herbestemmingen en moderniseringen.'},
+  ];
+  return(
+    <section id="diensten">
+      <div className="section-inner">
+        <div className={`reveal${vis?' in':''}`} ref={ref}>
+          <p className="section-label" style={{color:'var(--amber)'}}>Wat wij doen</p>
+          <div className="divider"/>
+          <h2 className="section-title">Onze diensten</h2>
+          <p className="section-body">Van eerste schets tot sleuteloverdracht begeleiden wij elk project van begin tot eind.</p>
+        </div>
+        <div className="srv-grid">
+          {items.map((s,i)=>{
+            const[r,v]=useInView();
+            return(
+              <div key={i} className={`srv-card reveal${v?' in':''}`} ref={r} style={{transitionDelay:`${i*0.12}s`}}>
+                <div className="srv-img-wrap"><img src={s.img} alt={s.title}/></div>
+                <div className="srv-body">
+                  <h3 className="srv-title">{s.title}</h3>
+                  <p className="srv-desc">{s.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── PORTFOLIO ── */
+const projects=[
+  {img:'imgi_5_Grebbelinie-fort-1-1.jpg',   name:'Grebbelinie Fort',           cat:'Utiliteitsbouw'},
+  {img:'imgi_6_Bar-Beton-Den-Haag.jpg',      name:'Bar Beton Den Haag',         cat:'Transformatie'},
+  {img:'imgi_7_Bedrijfspand-Zutphen-01.jpg', name:'Bedrijfspand Zutphen',       cat:'Utiliteitsbouw'},
+  {img:'imgi_8_Transformatie-Utrecht-WB31-2.jpg', name:'Transformatie Utrecht WB31', cat:'Transformatie'},
+  {img:'imgi_9_Sneek_renovatie_stationsgebouw.png', name:'Stationsgebouw Sneek',  cat:'Renovatie'},
+  {img:'imgi_4_1-klein-1-1.png',             name:'Villa Nieuwbouw',             cat:'Nieuwbouw'},
+];
+
+function Projecten(){
+  const[ref,vis]=useInView();
+  const cats=['Alle','Nieuwbouw','Utiliteitsbouw','Transformatie','Renovatie'];
+  const[active,setActive]=useState('Alle');
+  const visible=active==='Alle'?projects:projects.filter(p=>p.cat===active);
+  return(
+    <section id="projecten">
+      <div className="section-inner">
+        <div className={`reveal${vis?' in':''}`} ref={ref}>
+          <p className="section-label">Realisaties</p>
+          <div className="divider"/>
+          <h2 className="section-title">Onze projecten</h2>
+        </div>
+        <div className="filter-bar" style={{marginTop:36}}>
+          {cats.map(c=><button key={c} className={`f-btn${active===c?' active':''}`} onClick={()=>setActive(c)}>{c}</button>)}
+        </div>
+        <div className="port-grid">
+          {visible.map((p,i)=>(
+            <div key={p.name} className="port-item">
+              <img src={p.img} alt={p.name}/>
+              <div className="port-ov">
+                <p className="port-cat">{p.cat}</p>
+                <p className="port-name">{p.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── WERKGEBIED ── */
+function Werkgebied(){
+  const[ref,vis]=useInView();
+  const cities=['Deventer','Den Hoorn','Zutphen','Apeldoorn','Arnhem','Utrecht','Amsterdam','Den Haag','Rotterdam','Sneek','Almelo','Zwolle'];
+  return(
+    <section id="werkgebied">
+      <div className="section-inner">
+        <div className={`reveal${vis?' in':''}`} ref={ref}>
+          <p className="section-label">Bereik</p>
+          <div className="divider"/>
+          <h2 className="section-title">Werkgebied</h2>
+          <p className="wg-text" style={{marginTop:12}}>Temmink Bouwprojekten is actief door heel Nederland. Met vestigingen in Deventer en Den Hoorn kunnen wij snel en efficiënt projecten realiseren in de regio en ver daarbuiten.</p>
+          <div className="wg-cities" style={{marginTop:28}}>
+            {cities.map(c=><span key={c} className="wg-city">{c}</span>)}
+            <span className="wg-city" style={{background:'var(--amber)',border:'none',fontWeight:600}}>& heel NL</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── CONTACT ── */
+function Contact(){
+  const[ref,vis]=useInView();
+  return(
+    <section id="contact">
+      <div className="section-inner">
+        <div className={`reveal${vis?' in':''}`} ref={ref}>
+          <p className="section-label">Neem contact op</p>
+          <div className="divider"/>
+          <h2 className="section-title">Twee vestigingen,<br/>één aanspreekpunt</h2>
+        </div>
+        <div className="contact-grid">
+          {[
+            {
+              label:'Vestiging Oost',
+              name:'Temmink Bouwprojekten – Deventer',
+              rows:[
+                {icon:'📍',val:'Deventer'},
+                {icon:'📞',val:<a href="tel:0570000000">0570 – 000 000</a>},
+                {icon:'✉️',val:<a href="mailto:info@temmink.nl">info@temmink.nl</a>},
+              ]
+            },
+            {
+              label:'Vestiging West',
+              name:'Temmink Bouwprojekten – Den Hoorn',
+              rows:[
+                {icon:'📍',val:'Den Hoorn'},
+                {icon:'📞',val:<a href="tel:0150000000">0150 – 000 000</a>},
+                {icon:'✉️',val:<a href="mailto:info@temmink.nl">info@temmink.nl</a>},
+              ]
+            }
+          ].map((o,i)=>(
+            <div key={i} className="contact-office">
+              <p className="co-label">{o.label}</p>
+              <p className="co-name">{o.name}</p>
+              {o.rows.map((r,j)=>(
+                <div key={j} className="co-row">
+                  <span className="co-icon">{r.icon}</span>
+                  <span className="co-val">{r.val}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── FOOTER ── */
+function Footer(){
+  return(
+    <footer>
+      <div className="footer-inner">
+        <div className="footer-logo"><img src="imgi_1_01_Temmink-logo_CMYK_zonder-achtergrond.png" alt="Temmink"/></div>
+        <p className="footer-copy">© {new Date().getFullYear()} Temmink Bouwprojekten. Alle rechten voorbehouden.</p>
+      </div>
+    </footer>
+  );
+}
+
+/* ── APP ── */
+function App(){
+  useEffect(()=>{
+    const loader=document.getElementById('loader');
+    setTimeout(()=>loader.classList.add('hidden'),1800);
+
+    const els=document.querySelectorAll('.reveal');
+    const obs=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
+    },{threshold:0.12});
+    els.forEach(el=>obs.observe(el));
+    return()=>obs.disconnect();
+  },[]);
+
+  return(
+    <>
+      <Nav/>
+      <Hero/>
+      <About/>
+      <Diensten/>
+      <Projecten/>
+      <Werkgebied/>
+      <Contact/>
+      <Footer/>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
