@@ -211,18 +211,21 @@ function useInView(threshold=0.15){
   return[ref,vis];
 }
 
-function BadgeCount({end,suffix=''}){
+function BadgeCount({end,suffix='',delay=0}){
   const[val,setVal]=useState(0);
   const[ref,vis]=useInView(0.3);
   useEffect(()=>{
     if(!vis)return;
-    let start=0;const dur=1400;const step=16;
-    const timer=setInterval(()=>{
-      start+=Math.ceil(end/(dur/step));
-      if(start>=end){setVal(end);clearInterval(timer);}else setVal(start);
-    },step);
-    return()=>clearInterval(timer);
-  },[vis,end]);
+    let timer;
+    const timeout=setTimeout(()=>{
+      let start=0;const dur=1400;const step=16;
+      timer=setInterval(()=>{
+        start+=Math.ceil(end/(dur/step));
+        if(start>=end){setVal(end);clearInterval(timer);}else setVal(start);
+      },step);
+    },delay);
+    return()=>{clearTimeout(timeout);clearInterval(timer);};
+  },[vis,end,delay]);
   return <span ref={ref}>{val}{suffix}</span>;
 }
 
@@ -270,9 +273,9 @@ function Hero(){
         </h1>
         <p className="hero-sub reveal in">Vakkundig bouwen van idee tot oplevering — nieuwbouw, renovatie en transformatie door heel Nederland.</p>
         <div className="hero-strip">
-          <div className="h-st"><div className="h-st-n"><BadgeCount end={30}/>+</div><div className="h-st-l">Jaar ervaring</div></div>
-          <div className="h-st"><div className="h-st-n"><BadgeCount end={150}/>+</div><div className="h-st-l">Projecten</div></div>
-          <div className="h-st"><div className="h-st-n"><BadgeCount end={2}/></div><div className="h-st-l">Vestigingen</div></div>
+          <div className="h-st"><div className="h-st-n"><BadgeCount end={30} delay={1900}/>+</div><div className="h-st-l">Jaar ervaring</div></div>
+          <div className="h-st"><div className="h-st-n"><BadgeCount end={150} delay={1900}/>+</div><div className="h-st-l">Projecten</div></div>
+          <div className="h-st"><div className="h-st-n"><BadgeCount end={2} delay={1900}/></div><div className="h-st-l">Vestigingen</div></div>
         </div>
         <a href="#projecten" className="hero-btn reveal in">Bekijk projecten</a>
       </div>
